@@ -1,0 +1,8 @@
+# IntelliJ Files
+.idea/
+
+# VSCode Files
+.vscode/
+
+# Compiled Files
+out/

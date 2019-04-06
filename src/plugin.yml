@@ -1,0 +1,9 @@
+name: Chiles-Buildoff
+version: 0.0.1
+author: AzureAgst
+main: pw.azureagst.buildoff.Main
+api-version: 1.13
+commands:
+  build:
+    description: The main build command!
+    usage: /build
