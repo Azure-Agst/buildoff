@@ -62,7 +62,7 @@ public class BuildMain implements CommandExecutor {
                 break;
 
             default:
-                server.broadcastMessage(main.prefix + "subcommand " + args[0] + " is not a valid subcommand.");
+                server.broadcastMessage(main.prefix + args[0] + " is not a valid subcommand.");
                 break;
         }
         return true;
@@ -82,7 +82,7 @@ public class BuildMain implements CommandExecutor {
         // Announce Start!
         server.broadcastMessage(main.prefix + player.getPlayerListName() + " Started the next round!");
         for (Player online : Bukkit.getOnlinePlayers()) {
-            online.sendTitle("Begin!", "Good Luck!", 1, 8, 1);
+            online.sendTitle("Begin!", "Good Luck!", 10,40,10);
         }
 
         // Scoreboard stuff
@@ -128,7 +128,7 @@ public class BuildMain implements CommandExecutor {
         // Announce End!
         server.broadcastMessage(main.prefix + player.getPlayerListName() + " ended the current round!");
         for(Player online : Bukkit.getOnlinePlayers()){
-            player.sendTitle("Stop!", ":)", 1,8,1);
+            player.sendTitle("Stop!", ":)", 10,40,10);
             online.setScoreboard(manager.getNewScoreboard());
         }
 
