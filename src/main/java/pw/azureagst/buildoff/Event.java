@@ -12,7 +12,6 @@ public class Event implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        player.sendTitle("Welcome to the Build-Off!", ":)", 1,5,1);
     }
 
 }

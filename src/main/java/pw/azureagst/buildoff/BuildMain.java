@@ -50,76 +50,90 @@ public class BuildMain implements CommandExecutor {
         // Main switch
         switch (args[0]){
             case "start":
-                // cancel if running event
-                if (eventIsActive){
-                    server.broadcastMessage(main.prefix + "There's already an ongoing round!");
-                    return true;
-                } else {
-                    eventIsActive = true;
-                    server.broadcastMessage(main.prefix + player.getPlayerListName() + " Started the next round!");
-                    startTime = System.currentTimeMillis();
-                    endTime = startTime + (15 * 60000);
-                }
-
-                // Scoreboard stuff
-                objective = board.registerNewObjective("time", "dummy", "Time");
-                objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-                timeLeft = objective.getScore(ChatColor.GREEN + "Sec Left:");
-
-                // Main Timer
-                timer = new BukkitRunnable(){
-                    @Override
-                    public void run() {
-                        // Do time math
-                        long curtime = System.currentTimeMillis();
-                        int remain = (int)(BuildMain.endTime - curtime)/1000;
-
-                        timeLeft.setScore(remain);
-
-                        //10 minutes left
-                        if (remain == 10*60){
-                            server.broadcastMessage(main.prefix + "10 Minutes Left!");
-                        } else if (remain == 5*60){
-                            server.broadcastMessage(main.prefix + "5 Minutes Left!");
-                        }
-
-                        for(Player online : Bukkit.getOnlinePlayers()){
-                            online.setScoreboard(board);
-                        }
-                    }
-                }.runTaskTimer(main, 0,20);
+                if (!startEvent(player)) return false;
                 break;
 
             case "stop":
-                if (!eventIsActive){
-                    server.broadcastMessage(main.prefix + "There's not an ongoing round!");
-                    return true;
-                }
-
-                eventIsActive = false;
-                if (objective != null){
-                    objective.unregister();
-                }
-                timer.cancel();
-
-                for(Player online : Bukkit.getOnlinePlayers()){
-                    online.setScoreboard(manager.getNewScoreboard());
-                }
-
-                server.broadcastMessage(main.prefix + player.getPlayerListName() + " ended the current round!");
+                if (!endEvent(player)) return false;
                 break;
 
             case "help":
                 // TODO: Create Help Command
                 break;
+
             default:
                 server.broadcastMessage(main.prefix + "subcommand " + args[0] + " is not a valid subcommand.");
                 break;
         }
         return true;
-    } // end main
-
-    public static void alert(int time){
-        // TODO: wrap title implementation into here.
     }
+
+    private boolean startEvent(Player player){
+        // Cancel if already running event
+        if (eventIsActive){
+            server.broadcastMessage(main.prefix + "There's already an ongoing round!");
+            return true;
+        } else {
+            eventIsActive = true;
+            startTime = System.currentTimeMillis();
+            endTime = startTime + (15 * 60000);
+        }
+
+        // Announce Start!
+        server.broadcastMessage(main.prefix + player.getPlayerListName() + " Started the next round!");
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            online.sendTitle("Begin!", "Good Luck!", 1, 8, 1);
+        }
+
+        // Scoreboard stuff
+        objective = board.registerNewObjective("time", "dummy", "Time");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        timeLeft = objective.getScore(ChatColor.GREEN + "Sec Left:");
+
+        // Main Timer
+        timer = new BukkitRunnable(){
+            @Override
+            public void run() {
+                // Do time math
+                long curtime = System.currentTimeMillis();
+                int remain = (int)(BuildMain.endTime - curtime)/1000;
+
+                timeLeft.setScore(remain);
+
+                //10 minutes left
+                if (remain == 10*60){
+                    server.broadcastMessage(main.prefix + "10 Minutes Left!");
+                } else if (remain == 5*60){
+                    server.broadcastMessage(main.prefix + "5 Minutes Left!");
+                }
+
+                for(Player online : Bukkit.getOnlinePlayers()){
+                    online.setScoreboard(board);
+                }
+            }
+        }.runTaskTimer(main, 0,20);
+        return true;
+    }
+
+    private boolean endEvent(Player player){
+        if (!eventIsActive){
+            server.broadcastMessage(main.prefix + "There's not an ongoing round!");
+            return true;
+        } else {
+            eventIsActive = false;
+            objective.unregister();
+            timer.cancel();
+        }
+
+        // Announce End!
+        server.broadcastMessage(main.prefix + player.getPlayerListName() + " ended the current round!");
+        for(Player online : Bukkit.getOnlinePlayers()){
+            player.sendTitle("Stop!", ":)", 1,8,1);
+            online.setScoreboard(manager.getNewScoreboard());
+        }
+
+        return true;
+    }
+
+
 }
